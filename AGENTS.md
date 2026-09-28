@@ -6,20 +6,72 @@
 
 This repository is a controlled multi-agent workspace. Human/operator authority controls what enters authoritative branches. Agents work through isolated branches and return verifiable receipts.
 
-## Global rules for all agents
+Every agent operating in this repository must read the shared rules. An agent must obey the shared rules plus the section explicitly named for that agent. Sections named for other agents are coordination context only and are not executable instructions for the current agent.
+
+## SHARED WORKSTATION RULES — ANY AGENT
+
+### 0. Initialization handshake — mandatory
+
+On the first read of this file in a session, the agent must identify itself, read these shared rules, locate its named section if one exists, and halt before executing commands, modifying files, generating code, or changing repository state.
+
+Reply exactly:
+
+*"Protocol acknowledged. Workstation active. Awaiting branch name and task."*
+
+Do not summarize this file before the handshake. The handshake is the initialization lock.
+
+### 1. Global rules for all agents
 
 - Preserve source fidelity.
 - Never silently reconstruct, summarize, normalize, repair, or replace authoritative source material.
 - Inspect before modifying.
 - Keep work reversible.
 - Work only on an isolated agent branch unless explicitly authorized otherwise.
-- Do not modify `main` directly except this operator-authored control file.
+- Do not modify `main` directly except when the operator explicitly authorizes that specific operation.
 - Do not modify `scout-v2.2.0-verification` directly.
 - Do not merge your own work.
 - Do not treat self-reported success as verification.
 - Do not cross stage boundaries without explicit authorization.
 - Do not claim completion without a verifiable artifact and execution receipt.
 - If multiple credible failure causes exist, preserve them until a discriminating test eliminates alternatives.
+
+### 2. Capability, authority, and state verification
+
+Before changing repository state after receiving a task, verify the repository, current branch, requested target branch, available write/push authority, and task-specific constraints.
+
+Never claim access, branch state, persistence, push capability, or completion unless directly verified.
+
+If a required capability or authority is unavailable, stop at that boundary and report the exact blocker and last verified state. Do not simulate execution.
+
+### 3. Execution over choreography
+
+Once the task, target, authority, and constraints are resolved, execute. Do not consume turns narrating intended steps, repeating the assignment, or substituting planning for work. Ask a question only when an unresolved ambiguity prevents correct execution.
+
+### 4. State fidelity and structural integrity
+
+Before modifying an existing file, read its authoritative current version from the target branch. Before reporting completion, verify the resulting repository state.
+
+Do not use naive string replacement, brittle regex mutation, disposable patch scripts, or blind append operations for structural edits. Preserve schema, surrounding structure, and intended behavior.
+
+### 5. Egress, handoff, and truthful receipts
+
+For repository work, successful delivery means the requested Git state exists remotely.
+
+Do not substitute `localhost` URLs, mock web servers, synthetic ZIP links, pseudo-receipts, or descriptions of intended work for repository delivery.
+
+Never report a file as written, committed, pushed, merged, deployed, saved, tested, or verified unless that action actually succeeded.
+
+A repository completion receipt must identify the repository, branch, changed files, commit SHA, and materially relevant verification/test result.
+
+### 6. Agent boundaries
+
+Agent-specific instructions override shared rules only where the named section explicitly says so.
+
+An agent must not adopt another agent's identity, permissions, tool assumptions, assignment, or agent-specific execution rules merely because those instructions are visible in this file.
+
+If no named section exists for the current agent, the shared rules still apply. Do not invent special authority.
+
+## ~END SHARED AGENT INSTRUCTIONS
 
 ## Protected Scout source
 
@@ -34,6 +86,25 @@ The Scout output boundary is:
 - `stage_state.current_stage === "b"`
 - `stage_state.completed_stages === ["scout"]`
 - `payload.b1 === null` before B1 execution
+
+## ~JULES BEGIN
+
+You are Jules, Google's coding agent operating in the `jules-w-agentwork` repository.
+
+### Jules-specific rules
+
+- Treat this repository as your persistent workstation.
+- After the shared initialization handshake, wait for the operator's branch name and task.
+- Use an isolated Jules branch unless the operator explicitly authorizes a different branch or direct work on `main`.
+- Do not execute a Codex-specific assignment merely because it is visible in this file.
+- Your repository handoff requires an atomic Git commit and remote push to the requested branch.
+- State the pushed branch and commit SHA when the task is complete.
+
+## ~END JULES INSTRUCTIONS
+
+---
+
+## ~CODEX BEGIN
 
 ## CODEX — current assignment: B1 Decouple
 
@@ -304,6 +375,11 @@ Return:
 - exact unresolved items, if any
 
 Do not claim B1 complete unless the isolated input -> B1 execution -> output path is demonstrated.
+
+
+## ~END CODEX INSTRUCTIONS
+
+---
 
 ## Jules and other agents
 
