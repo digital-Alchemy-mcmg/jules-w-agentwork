@@ -7,7 +7,9 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:b1": "node --test --experimental-test-isolation=none tests/b1Engine.test.mjs",
+    "b1": "node scripts/b1-run.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

@@ -91,6 +91,46 @@ export interface ScoutPayload {
   cartridge_id: string;
 }
 
+export type B1Marker = '*' | '≈' | '';
+export interface B1SourceSpan {
+  source_span_id: string;
+  raw_text: string;
+  /** Half-open JavaScript UTF-16 offsets into the preserved source string. */
+  start_offset: number;
+  end_offset: number;
+}
+export interface B1Primitive {
+  marker: B1Marker;
+  node_text: string;
+  source_span_id: string;
+  qualifier_scope?: string;
+}
+export type B1MalformDiagnostic = 'VALID_JOB_OBJECT'
+  | 'MALFORMED — ORIGIN MISSING' | 'MALFORMED — DESTINATION MISSING'
+  | 'MALFORMED — UNROUTABLE JOB OBJECT';
+export interface B1Payload {
+  b1_header: {
+    session_uid: string;
+    stage_status: 'completed' | 'halted';
+    malform_diagnostic: B1MalformDiagnostic;
+    candidate_blind_airlock: 'VERIFIED_LOCKED';
+    boundary_b_in_hash: string;
+    boundary_b_out_hash: string;
+    mode: 'HALT_ON_MALFORM';
+  };
+  target_identification_envelope: Record<
+    'company_organization' | 'posting_party' | 'job_title' | 'requisition_id'
+    | 'employment_type' | 'location' | 'work_arrangement' | 'relocation_terms'
+    | 'compensation' | 'schedule_posting_date', B1Primitive[]>;
+  application_routing: Record<'application_method' | 'destination_url'
+    | 'recruiter_contact' | 'required_submission_materials' | 'special_instructions', B1Primitive[]>;
+  operational_primitives: Record<'target_role' | 'hard_candidate_gates'
+    | 'contextual_conditions' | 'required_role_responsibilities', B1Primitive[]>;
+  source_spans: B1SourceSpan[];
+  de_theatricalization_log: Array<{ source_span_id: string; action: 'retained'; reason: string }>;
+  diagnostic_trace: Array<{ source_span_id?: string; code: string; detail: string }>;
+}
+
 export interface TravelingEnvelope {
   schema_version: '0.2.0';
   envelope_id: string;
@@ -119,6 +159,10 @@ export interface TravelingEnvelope {
     current_stage: 'b';
     completed_stages: ['scout'];
     status: 'ready';
+  } | {
+    current_stage: 'b2';
+    completed_stages: ['scout', 'b1'];
+    status: 'ready';
   };
   append_log: Array<{
     stage: string;
@@ -133,13 +177,18 @@ export interface TravelingEnvelope {
   payload: {
     scout: ScoutPayload;
     b: null;
-    b1: null;
+    b1: B1Payload | null;
     b2: null;
     b3: null;
     b4: null;
     b5: null;
   };
 }
+
+export type B1OutputEnvelope = TravelingEnvelope & {
+  stage_state: { current_stage: 'b2'; completed_stages: ['scout', 'b1']; status: 'ready' };
+  payload: TravelingEnvelope['payload'] & { b1: B1Payload };
+};
 
 export interface CompletionReceipt {
   runner_id: string;
