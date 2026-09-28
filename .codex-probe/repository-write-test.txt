@@ -1,0 +1,6 @@
+Repository: digital-Alchemy-mcmg/jules-w-agentwork
+Source branch: scout-v2.2.0-verification
+Source HEAD SHA: d237385a7464617d3d127f54868c983d5800a992
+Codex probe branch: codex/scout-probe
+Execution timestamp: 2026-09-28T11:11:40.8349533Z
+Disposable Codex repository authority probe.
