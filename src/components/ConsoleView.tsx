@@ -254,8 +254,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 <span className="text-emerald-400 font-mono text-[11px]">VERIFIED</span>
               </div>
               <p className="text-slate-400 text-xs">{criterion.requirement}</p>
-              <div className="pt-1 text-[11px] text-slate-500 font-mono">
-                Evidence: {criterion.evidence}
+              <div className="pt-1 text-[11px] text-slate-500 font-mono">                Evidence: {criterion.evidence}
               </div>
             </div>
           ))}
