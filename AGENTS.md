@@ -73,6 +73,27 @@ If no named section exists for the current agent, the shared rules still apply. 
 
 ## ~END SHARED AGENT INSTRUCTIONS
 
+## B1 PLUG-IN FREEZE — DO NOT REOPEN DURING B2 WORK
+
+B1 is frozen as a plug-in boundary for downstream work.
+
+- Frozen branch: `release/b1-plugin-v1`
+- Frozen commit: `40cf71b4c87992d7ae3dba11b5ea9c0d71926e19`
+- Provenance branch: `codex/b1-decouple`
+- Upstream Scout source: `scout-v2.2.0-verification`
+- Upstream Scout source HEAD: `d237385a7464617d3d127f54868c983d5800a992`
+- Entry boundary: Scout envelope at `b / [scout] / ready`
+- Exit boundary: B1-populated envelope at `b2 / [scout, b1] / ready`
+- Downstream slots `b2` through `b5` remain null at B1 exit.
+
+### Freeze rule
+
+Any agent beginning B2 work must consume the B1 output contract from `release/b1-plugin-v1` at the frozen commit above. Do not redesign, reinterpret, reconcile with another agent's B1 implementation, or modify B1 merely to begin B2.
+
+B1 may be reopened only by explicit operator instruction prompted by a demonstrated B1→B2 integration failure, contract defect, or later intentional revision.
+
+The working branch `codex/b1-decouple` is provenance, not the downstream dependency. The release branch and frozen commit above are the B1 plug-in dependency.
+
 ## Protected Scout source
 
 Authoritative Scout source branch:
