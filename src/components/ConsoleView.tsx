@@ -263,3 +263,4 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
     </div>
   );
 };
+
