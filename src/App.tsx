@@ -12,6 +12,7 @@ import { CartridgeView } from './components/CartridgeView';
 import { GateTelemetryView } from './components/GateTelemetryView';
 import { EnvelopesView } from './components/EnvelopesView';
 import { ReceiptView } from './components/ReceiptView';
+import { B1View } from './components/B1View';
 import { HandoffModal } from './components/HandoffModal';
 import { JobCandidate, RawJobInput, TravelingEnvelope, CompletionReceipt } from './types/scout';
 import { processLiveJobToEnvelope, generateLiveCompletionReceipt } from './services/scoutEngine';
@@ -115,6 +116,13 @@ export default function App() {
           <GateTelemetryView 
             candidates={candidates}
             onNavigateToIngest={() => setActiveTab('ingest')}
+          />
+        )}
+
+        {activeTab === 'b1' && (
+          <B1View
+            candidates={candidates}
+            envelopes={envelopes}
           />
         )}
 
