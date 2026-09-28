@@ -15,8 +15,7 @@ interface HandoffModalProps {
 export const HandoffModal: React.FC<HandoffModalProps> = ({
   isOpen,
   onClose,
-  onViewReceipt,
-  onViewEnvelopes,
+  onViewReceipt,  onViewEnvelopes,
   receipt,
   envelopesCount
 }) => {
