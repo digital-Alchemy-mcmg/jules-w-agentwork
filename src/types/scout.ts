@@ -133,7 +133,7 @@ export interface TravelingEnvelope {
   payload: {
     scout: ScoutPayload;
     b: null;
-    b1: null;
+    b1: B1Payload | null;
     b2: null;
     b3: null;
     b4: null;
@@ -201,4 +201,8 @@ export interface TestResult {
   durationMs: number;
   passed: boolean;
   assertionsCount: number;
+}
+
+export interface B1Payload {
+  processed_source_text: string;
 }
