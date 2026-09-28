@@ -91,6 +91,10 @@ export interface ScoutPayload {
   cartridge_id: string;
 }
 
+export interface B1Payload {
+  processed_source_text: string;
+}
+
 export interface TravelingEnvelope {
   schema_version: '0.2.0';
   envelope_id: string;
@@ -116,8 +120,8 @@ export interface TravelingEnvelope {
     };
   };
   stage_state: {
-    current_stage: 'b';
-    completed_stages: ['scout'];
+    current_stage: 'b' | 'b1';
+    completed_stages: string[];
     status: 'ready';
   };
   append_log: Array<{
@@ -201,8 +205,4 @@ export interface TestResult {
   durationMs: number;
   passed: boolean;
   assertionsCount: number;
-}
-
-export interface B1Payload {
-  processed_source_text: string;
 }
