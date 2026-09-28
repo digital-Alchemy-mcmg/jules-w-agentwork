@@ -82,7 +82,6 @@ export const TEST_SUITE_RUNS: TestResult[] = [
   { name: "test_envelope_initialization_with_scout_stage", description: "Verified v0.2 envelope invariants, stage transition to current_stage: 'b', and downstream null slots.", durationMs: 5, passed: true, assertionsCount: 11 },
   { name: "test_live_ingest_no_hardcoding", description: "Verified cleanroom execution against novel live job posting without internal data dependencies.", durationMs: 10, passed: true, assertionsCount: 18 }
 ];
-
 export const STOP_CONDITION_CRITERIA = [
   {
     title: "Path A Structured Preservation",
