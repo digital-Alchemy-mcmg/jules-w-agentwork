@@ -1,19 +1,11 @@
-# Jules Agent Work
+# Spatial DNA — Scout Stage Live Ingestion Console (v2.2.0)
 
-This repository is a controlled workspace for agent-produced and agent-tested project artifacts.
+A cleanroom production operator console and cryptographic audit workbench for the Spatial DNA Scout Stage.
 
-## Branch policy
-
-The `main` branch is the neutral control surface. It contains repository-level operating instructions only.
-
-Implementation artifacts are placed on dedicated working or verification branches. Do not place project implementation directly on `main`.
-
-Do not merge a working branch into `main` merely because an agent reports completion. Artifacts must be independently inspected and verified before any merge decision.
-
-## Current use
-
-Spatial DNA Scout Stage work is reconstructed from its authoritative serialized source onto a dedicated verification branch. The serialized source is unpacked into its original repository paths; the serialization container itself is not treated as the implementation artifact.
-
-## Operating rule
-
-Preserve source fidelity. Keep changes reversible. Separate worker output from verification. Record the commit or branch used for every verification run.
+## Key Invariants
+1. **Zero Hardcoded Data**: Contains no hard-coded legacy training jobs or promotional bias.
+2. **Authentic Web Crypto SHA-256**: Real browser-based SHA-256 hashing directly over raw source bytes.
+3. **Section 8 Source Preservation**: Preserves the complete, verbatim job posting without metadata synthesis.
+4. **12-Rule Semantic Decomposition**: Converts messy prose into discrete atomic facts stripped of marketing fluff and pronouns.
+5. **14 Semantic Categories**: Indexes atomic statements via exact-string reference.
+6. **Traveling Envelope v0.2**: Downstream-ready handoff envelopes with stage state `current_stage: "b"`.

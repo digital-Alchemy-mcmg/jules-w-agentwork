@@ -1,0 +1,6 @@
+{
+  "name": "Spatial DNA — Scout Stage Live Ingestion Console",
+  "description": "Production operator console and cryptographic audit workbench for Spatial DNA Scout Stage (v2.2.0). Features authentic live job description ingestion, Web Crypto SHA-256 source hashing, 12-rule atomic decomposition, and Traveling Envelope v0.2 assembly with zero hard-coded candidate bias.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
