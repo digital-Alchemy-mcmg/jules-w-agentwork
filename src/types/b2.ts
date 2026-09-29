@@ -67,6 +67,7 @@ export interface TargetTreeNode {
   statement: string;
   b1_primitive_refs: string[];
   source_span_refs: string[];
+  qualifier_scope?: string;
   children: TargetTreeNode[];
 }
 

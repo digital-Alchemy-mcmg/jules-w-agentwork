@@ -1,3 +1,12 @@
+
+export interface RelationshipEdge {
+  edge_id: string;
+  source_address: string;
+  target_address: string;
+  relation_type: string;
+  description?: string;
+  provenance_spans: string[];
+}
 export interface RawJobInput {
   id: string; // e.g. JOB-LIVE-001
   title: string;
@@ -128,6 +137,7 @@ export interface B1Payload {
   source_spans: B1SourceSpan[];
   de_theatricalization_log: Array<{ source_span_id: string; action: 'retained'; reason: string }>;
   diagnostic_trace: Array<{ source_span_id?: string; code: string; detail: string }>;
+  processed_source_text?: string;
 }
 
 
@@ -155,7 +165,7 @@ export interface B2Payload {
     dispositions: Record<string, import('./b2').PrimitiveDisposition>;
     summary: any;
   };
-  relationship_graph: any;
+  relationship_graph: RelationshipEdge[];
 }
 
 export interface TravelingEnvelope {

@@ -195,7 +195,7 @@ export async function processB2Stage(envelope: TravelingEnvelope): Promise<Trave
   }
 
   // 3. Operational Primitives (Target Role, Hard Gates, Contextual, Responsibilities)
-  const opPrims = b1.operational_primitives || {};
+  const opPrims = b1.operational_primitives || {} as any;
 
   // Target Role
   const rolePrims: B1Primitive[] = opPrims.target_role || [];
@@ -319,7 +319,8 @@ export async function processB2Stage(envelope: TravelingEnvelope): Promise<Trave
                       statement: valStr,
                       b1_primitive_refs: [primId],
                       source_span_refs: spanIds,
-                      children: [] // simplified qualifier_scope handling for now
+                      qualifier_scope: prim.qualifier_scope,
+                      children: []
                   });
                   provenance.recordProvenance(childAddr, primId, spanIds);
                   nodeCount++;
@@ -461,6 +462,24 @@ export async function processB2Stage(envelope: TravelingEnvelope): Promise<Trave
   // Create hash for freeze seal
   const treeHash = await hashTargetTree(rootNode);
 
+
+  const relationshipEdges: import('../types/scout').RelationshipEdge[] = [];
+  // Example basic structural relationships (Target Role -> Hard Gates)
+  if (roleChildren.length > 0 && topLevelBranches.find(b => b.label === "REQUIREMENTS")) {
+      const roleNodeAddr = roleChildren[0].address;
+      const reqNode = topLevelBranches.find(b => b.label === "REQUIREMENTS");
+      if (reqNode) {
+          relationshipEdges.push({
+              edge_id: "EDGE-001",
+              source_address: roleNodeAddr,
+              target_address: reqNode.address,
+              relation_type: "has_requirements",
+              description: "Target Role dictates Candidate Requirements",
+              provenance_spans: []
+          });
+      }
+  }
+
   const b2Payload: B2Payload = {
     b2_header: {
       session_uid: sessionUid,
@@ -487,7 +506,7 @@ export async function processB2Stage(envelope: TravelingEnvelope): Promise<Trave
         rejected_with_reason: rejected
       }
     },
-    relationship_graph: {}
+    relationship_graph: relationshipEdges
   };
 
   clonedEnvelope.payload.b2 = b2Payload;
