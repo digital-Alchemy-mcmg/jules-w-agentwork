@@ -92,7 +92,45 @@ export interface ScoutPayload {
 }
 
 export interface B1Payload {
+  b1_header?: {
+    session_uid: string;
+    stage_status: string;
+    candidate_blind_airlock: string;
+  };
+  target_identification_envelope?: any;
+  application_routing?: any;
+  operational_primitives?: any;
+  source_spans?: any;
+  de_theatricalization_log?: any;
   processed_source_text: string;
+}
+
+
+export interface B2Payload {
+  b2_header: {
+    session_uid: string;
+    stage_status: string;
+    candidate_blind_airlock: 'VERIFIED_LOCKED';
+    target_tree_hash: string;
+    node_count: number;
+    freeze_state: 'FROZEN_B2';
+  };
+  target_tree: import('./b2').TargetTreeNode;
+  address_index: Record<string, string>;
+  provenance_map: {
+    span_to_addresses: Record<string, string[]>;
+    address_to_spans: Record<string, string[]>;
+    primitive_to_addresses: Record<string, string[]>;
+  };
+  completeness_manifest: {
+    session_uid: string;
+    total_primitives_evaluated: number;
+    status: 'COMPLETE_PASS' | 'INCOMPLETE_HALT';
+    unresolved_count: number;
+    dispositions: Record<string, import('./b2').PrimitiveDisposition>;
+    summary: any;
+  };
+  relationship_graph: any;
 }
 
 export interface TravelingEnvelope {
@@ -120,7 +158,7 @@ export interface TravelingEnvelope {
     };
   };
   stage_state: {
-    current_stage: 'b' | 'b1';
+    current_stage: 'b' | 'b1' | 'b2' | 'b3';
     completed_stages: string[];
     status: 'ready';
   };
@@ -138,7 +176,7 @@ export interface TravelingEnvelope {
     scout: ScoutPayload;
     b: null;
     b1: B1Payload | null;
-    b2: null;
+    b2: B2Payload | null;
     b3: null;
     b4: null;
     b5: null;
