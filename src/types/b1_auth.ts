@@ -95,6 +95,7 @@ export type B1Marker = '*' | '≈' | '';
 export interface B1SourceSpan {
   source_span_id: string;
   raw_text: string;
+  /** Half-open JavaScript UTF-16 offsets into the preserved source string. */
   start_offset: number;
   end_offset: number;
 }
@@ -130,34 +131,6 @@ export interface B1Payload {
   diagnostic_trace: Array<{ source_span_id?: string; code: string; detail: string }>;
 }
 
-
-export interface B2Payload {
-  b2_header: {
-    session_uid: string;
-    stage_status: string;
-    candidate_blind_airlock: 'VERIFIED_LOCKED';
-    target_tree_hash: string;
-    node_count: number;
-    freeze_state: 'FROZEN_B2';
-  };
-  target_tree: import('./b2').TargetTreeNode;
-  address_index: Record<string, string>;
-  provenance_map: {
-    span_to_addresses: Record<string, string[]>;
-    address_to_spans: Record<string, string[]>;
-    primitive_to_addresses: Record<string, string[]>;
-  };
-  completeness_manifest: {
-    session_uid: string;
-    total_primitives_evaluated: number;
-    status: 'COMPLETE_PASS' | 'INCOMPLETE_HALT';
-    unresolved_count: number;
-    dispositions: Record<string, import('./b2').PrimitiveDisposition>;
-    summary: any;
-  };
-  relationship_graph: any;
-}
-
 export interface TravelingEnvelope {
   schema_version: '0.2.0';
   envelope_id: string;
@@ -183,8 +156,12 @@ export interface TravelingEnvelope {
     };
   };
   stage_state: {
-    current_stage: 'b' | 'b1' | 'b2' | 'b3';
-    completed_stages: string[];
+    current_stage: 'b';
+    completed_stages: ['scout'];
+    status: 'ready';
+  } | {
+    current_stage: 'b2';
+    completed_stages: ['scout', 'b1'];
     status: 'ready';
   };
   append_log: Array<{
@@ -201,12 +178,17 @@ export interface TravelingEnvelope {
     scout: ScoutPayload;
     b: null;
     b1: B1Payload | null;
-    b2: B2Payload | null;
+    b2: null;
     b3: null;
     b4: null;
     b5: null;
   };
 }
+
+export type B1OutputEnvelope = TravelingEnvelope & {
+  stage_state: { current_stage: 'b2'; completed_stages: ['scout', 'b1']; status: 'ready' };
+  payload: TravelingEnvelope['payload'] & { b1: B1Payload };
+};
 
 export interface CompletionReceipt {
   runner_id: string;
