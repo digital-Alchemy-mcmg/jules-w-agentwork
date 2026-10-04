@@ -1,161 +1,71 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+import React from 'react';
+import { MaraProvider, useMara } from './context/MaraContext';
+import OperatorInterface from './components/operator/OperatorInterface';
+import WorkspaceInterface from './components/workspace/WorkspaceInterface';
 
-import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
-import { ConsoleView } from './components/ConsoleView';
-import { LiveIngestView } from './components/LiveIngestView';
-import { CorpusView } from './components/CorpusView';
-import { CartridgeView } from './components/CartridgeView';
-import { GateTelemetryView } from './components/GateTelemetryView';
-import { EnvelopesView } from './components/EnvelopesView';
-import { ReceiptView } from './components/ReceiptView';
-import { HandoffModal } from './components/HandoffModal';
-import { JobCandidate, RawJobInput, TravelingEnvelope, CompletionReceipt } from './types/scout';
-import { processLiveJobToEnvelope, generateLiveCompletionReceipt } from './services/scoutEngine';
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('console');
-  const [candidates, setCandidates] = useState<JobCandidate[]>([]);
-  const [envelopes, setEnvelopes] = useState<TravelingEnvelope[]>([]);
-  const [selectedEnvelopeId, setSelectedEnvelopeId] = useState<string>('');
-  const [lastIngestedEnvelopeId, setLastIngestedEnvelopeId] = useState<string>('');
-  const [isHandoffModalOpen, setIsHandoffModalOpen] = useState<boolean>(false);
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-
-  // Dynamic live receipt generated from actual candidates & envelopes
-  const [receipt, setReceipt] = useState<CompletionReceipt>(() => 
-    generateLiveCompletionReceipt([], [])
-  );
-
-  // Update live receipt whenever candidates or envelopes change
-  useEffect(() => {
-    const updated = generateLiveCompletionReceipt(candidates, envelopes);
-    setReceipt(updated);
-  }, [candidates, envelopes]);
-
-  const handleIngestJob = async (input: RawJobInput) => {
-    setIsProcessing(true);
-    try {
-      const { candidate, envelope } = await processLiveJobToEnvelope(
-        input,
-        candidates.length,
-        "live-intake-corpus"
-      );
-
-      setCandidates(prev => [candidate, ...prev]);
-
-      if (envelope) {
-        setEnvelopes(prev => [envelope, ...prev]);
-        setSelectedEnvelopeId(envelope.envelope_id);
-        setLastIngestedEnvelopeId(envelope.envelope_id);
-      }
-    } catch (err) {
-      console.error("Live Ingestion error:", err);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleInspectEnvelope = (envelopeId: string) => {
-    setSelectedEnvelopeId(envelopeId);
-    setActiveTab('envelopes');
-  };
+function MaraShell() {
+  const { uiMode, setUiMode } = useMara();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      {/* Top Bar (Universal 3-Zone Contract) */}
-      <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenReceiptModal={() => setIsHandoffModalOpen(true)}
-        receipt={receipt}
-      />
-
-      {/* Main Workspace Viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeTab === 'console' && (
-          <ConsoleView
-            candidates={candidates}
-            envelopes={envelopes}
-            receipt={receipt}
-            onSelectTab={setActiveTab}
-            onSelectEnvelope={handleInspectEnvelope}
-          />
-        )}
-
-        {activeTab === 'ingest' && (
-          <LiveIngestView
-            onIngest={handleIngestJob}
-            isProcessing={isProcessing}
-            onOpenEnvelope={handleInspectEnvelope}
-            lastIngestedEnvelopeId={lastIngestedEnvelopeId}
-          />
-        )}
-
-        {activeTab === 'corpus' && (
-          <CorpusView 
-            candidates={candidates}
-            onInspectEnvelope={handleInspectEnvelope}
-            onNavigateToIngest={() => setActiveTab('ingest')}
-          />
-        )}
-
-        {activeTab === 'envelopes' && (
-          <EnvelopesView 
-            envelopes={envelopes}
-            initialEnvelopeId={selectedEnvelopeId}
-            onNavigateToIngest={() => setActiveTab('ingest')}
-          />
-        )}
-
-        {activeTab === 'telemetry' && (
-          <GateTelemetryView 
-            candidates={candidates}
-            onNavigateToIngest={() => setActiveTab('ingest')}
-          />
-        )}
-
-        {activeTab === 'receipt' && (
-          <ReceiptView receipt={receipt} />
-        )}
-
-        {activeTab === 'cartridge' && (
-          <CartridgeView />
-        )}
-      </main>
-
-      {/* Clean Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-5 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono">
+    <div className="min-h-screen flex flex-col font-sans">
+      {/* Top Persistent UI Interface Switcher Banner */}
+      <header className="no-print bg-[#111827] text-white border-b border-[#1F2937] px-6 py-2.5 flex items-center justify-between text-xs sticky top-0 z-50 shadow-md">
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-slate-400 font-semibold">Spatial DNA</span>
-            <span> </span>
-            <span>Scout Stage v2.2.0</span>
-            <span> </span>
-            <span className="text-emerald-400">Stop Condition Satisfied</span>
+            <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
+            <span className="font-semibold tracking-wider font-mono text-[11px] uppercase text-[#F3F4F6]">
+              MARA Application Core
+            </span>
           </div>
-          <div className="flex items-center gap-3 text-[11px] text-slate-500">
-            <span>Commit: <strong className="text-slate-400">{receipt.commit_sha.slice(0, 7)}</strong></span>
-            <span> </span>
-            <span>Tag: <strong className="text-slate-400">{receipt.git_tag}</strong></span>
-            <span> </span>
-            <span className="text-cyan-400">current_stage: "b"</span>
+          <span className="text-[#4B5563]">|</span>
+          <span className="text-[#9CA3AF] hidden sm:inline text-[11px]">
+            Single Authoritative State Engine (B1–B5 • Spatial DNA • Resume Factory)
+          </span>
+        </div>
+
+        {/* Persistent UI-Mode Toggle */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center bg-[#1F2937] rounded-full p-0.5 border border-[#374151]">
+            <button
+              onClick={() => setUiMode('operator')}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                uiMode === 'operator'
+                  ? 'bg-white text-[#111827] shadow-sm font-semibold'
+                  : 'text-[#9CA3AF] hover:text-white'
+              }`}
+            >
+              Operator Interface
+            </button>
+            <button
+              onClick={() => setUiMode('workspace')}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                uiMode === 'workspace'
+                  ? 'bg-[#3B82F6] text-white shadow-sm font-semibold'
+                  : 'text-[#9CA3AF] hover:text-white'
+              }`}
+            >
+              Workspace Interface
+            </button>
           </div>
         </div>
-      </footer>
+      </header>
 
-      {/* Handoff Verification Modal */}
-      <HandoffModal
-        isOpen={isHandoffModalOpen}
-        onClose={() => setIsHandoffModalOpen(false)}
-        onViewReceipt={() => setActiveTab('receipt')}
-        onViewEnvelopes={() => setActiveTab('envelopes')}
-        receipt={receipt}
-        envelopesCount={envelopes.length}
-      />
+      {/* Active Presentation Surface */}
+      <div className="flex-1">
+        {uiMode === 'operator' ? (
+          <OperatorInterface />
+        ) : (
+          <WorkspaceInterface />
+        )}
+      </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <MaraProvider>
+      <MaraShell />
+    </MaraProvider>
   );
 }

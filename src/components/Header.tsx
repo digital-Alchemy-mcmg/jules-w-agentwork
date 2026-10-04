@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Zone 1: Single text element wordmark */}
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setActiveTab('console')}
             className="text-left group cursor-pointer"
           >

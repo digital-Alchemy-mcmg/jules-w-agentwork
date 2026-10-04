@@ -176,7 +176,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
               <span className="text-slate-500 font-mono text-xs">Audit & Inspection</span>
             </div>
             <div className="space-y-2 text-xs">
-              <button 
+              <button
                 onClick={() => onSelectTab('ingest')}
                 className="w-full text-left p-2.5 bg-cyan-950/30 hover:bg-cyan-950/50 border border-cyan-800/50 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -186,7 +186,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('corpus')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -196,7 +196,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('envelopes')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -206,7 +206,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('telemetry')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -216,7 +216,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('receipt')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >

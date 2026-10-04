@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  FileText, Copy, Check, Download, Layers, Database, Lock, CheckCircle2, PlusCircle
+import {
+  FileText, Copy, Check, Download, Layers, Database, Lock, CheckCircle2, PlusCircle, Play, FastForward
 } from 'lucide-react';
 import { FOURTEEN_SEMANTIC_CATEGORIES } from '../data/scoutData';
 import { TravelingEnvelope } from '../types/scout';
@@ -9,12 +9,16 @@ interface EnvelopesViewProps {
   envelopes: TravelingEnvelope[];
   initialEnvelopeId?: string;
   onNavigateToIngest: () => void;
+  onAdvancePipeline?: (envId: string) => Promise<void>;
+  isAdvancing?: boolean;
 }
 
 export const EnvelopesView: React.FC<EnvelopesViewProps> = ({
   envelopes,
   initialEnvelopeId,
-  onNavigateToIngest
+  onNavigateToIngest,
+  onAdvancePipeline,
+  isAdvancing = false,
 }) => {
   const [selectedEnvId, setSelectedEnvId] = useState<string>(
     initialEnvelopeId || envelopes[0]?.envelope_id || ''
@@ -24,7 +28,7 @@ export const EnvelopesView: React.FC<EnvelopesViewProps> = ({
   const [copiedJson, setCopiedJson] = useState<boolean>(false);
   const [copiedSource, setCopiedSource] = useState<boolean>(false);
 
-  const currentEnvelope: TravelingEnvelope | undefined = 
+  const currentEnvelope: TravelingEnvelope | undefined =
     envelopes.find(e => e.envelope_id === selectedEnvId) || envelopes[0];
 
   const handleCopyJson = () => {
@@ -134,6 +138,18 @@ export const EnvelopesView: React.FC<EnvelopesViewProps> = ({
           >
             {copiedJson ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
           </button>
+          {onAdvancePipeline && currentEnvelope.stage_state.current_stage !== 'stop_before_resume_factory' && (
+            <button
+              onClick={() => onAdvancePipeline(currentEnvelope.envelope_id)}
+              disabled={isAdvancing}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-900 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-50 rounded transition-colors cursor-pointer"
+              title="Execute B1 through B5 straight-through"
+            >
+              <FastForward className="w-3.5 h-3.5" />
+              <span>{isAdvancing ? 'Executing Pipeline...' : 'Advance B1 → B5'}</span>
+            </button>
+          )}
+
           <button
             onClick={handleDownloadEnvelope}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-900 bg-cyan-400 hover:bg-cyan-300 rounded transition-colors cursor-pointer"
@@ -392,26 +408,96 @@ export const EnvelopesView: React.FC<EnvelopesViewProps> = ({
             </div>
           </div>
 
-          {/* Downstream Payload Isolation */}
-          <div className="border border-slate-800 bg-slate-900/40 rounded-lg p-5 space-y-3">
+          {/* Stage Payload Inspector & Isolation Matrix */}
+          <div className="border border-slate-800 bg-slate-900/40 rounded-lg p-5 space-y-4">
             <div className="border-b border-slate-800 pb-2 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
-                <Lock className="w-4 h-4 text-amber-400" />
-                Downstream Payload Isolation (Handoff Boundary)
+                <Lock className="w-4 h-4 text-cyan-400" />
+                Pipeline Stage Payloads (Scout → B1 → B2 → B3 → B4 → B5)
               </h3>
-              <span className="text-[11px] font-mono text-emerald-400">ENFORCED</span>
+              <span className="text-[11px] font-mono text-emerald-400">
+                ACTIVE: {currentEnvelope.stage_state.current_stage.toUpperCase()}
+              </span>
             </div>
             <p className="text-xs text-slate-400">
-              In strict accordance with the Scout Output Boundary contract, all downstream stage payload slots remain explicitly null.
+              Each stage appends its verified cryptographic payload without altering upstream facts. Downstream slots remain null until reached.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs font-mono pt-1">
-              {['payload.b', 'payload.b1', 'payload.b2', 'payload.b3', 'payload.b4', 'payload.b5'].map((slot) => (
-                <div key={slot} className="p-2 bg-slate-950 border border-slate-800 rounded text-center">
-                  <span className="text-slate-400 block text-[10px]">{slot}</span>
-                  <span className="text-amber-400 font-semibold">null</span>
-                </div>
-              ))}
+              {(['b', 'b1', 'b2', 'b3', 'b4', 'b5'] as const).map((slot) => {
+                const val = (currentEnvelope.payload as any)[slot];
+                const isPopulated = val !== null && val !== undefined;
+                return (
+                  <div key={slot} className={`p-2 rounded text-center border ${isPopulated ? 'bg-cyan-950/40 border-cyan-700/60' : 'bg-slate-950 border-slate-800'}`}>
+                    <span className="text-slate-400 block text-[10px]">payload.{slot}</span>
+                    <span className={`font-semibold ${isPopulated ? 'text-cyan-300' : 'text-slate-600'}`}>
+                      {isPopulated ? 'POPULATED' : 'null'}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
+
+            {/* B1 Target Primitives */}
+            {currentEnvelope.payload.b1 && (
+              <div className="p-3 bg-slate-950 border border-slate-800 rounded space-y-2 text-xs">
+                <div className="flex items-center justify-between text-cyan-400 font-mono">
+                  <span className="font-semibold">B1 Decouple Envelope</span>
+                  <span>Airlock: {currentEnvelope.payload.b1.b1_header.candidate_blind_airlock}</span>
+                </div>
+                <div className="text-slate-400 text-[11px]">
+                  Primitives: Hard Gates ({currentEnvelope.payload.b1.operational_primitives.hard_candidate_gates.length}), Contextual ({currentEnvelope.payload.b1.operational_primitives.contextual_conditions.length}), Duties ({currentEnvelope.payload.b1.operational_primitives.required_role_responsibilities.length})
+                </div>
+              </div>
+            )}
+
+            {/* B2 Target Tree */}
+            {currentEnvelope.payload.b2 && (
+              <div className="p-3 bg-slate-950 border border-slate-800 rounded space-y-2 text-xs">
+                <div className="flex items-center justify-between text-emerald-400 font-mono">
+                  <span className="font-semibold">B2 Target Tree</span>
+                  <span>Tree ID: {currentEnvelope.payload.b2.tree_id} (Frozen: {currentEnvelope.payload.b2.frozen ? 'TRUE' : 'FALSE'})</span>
+                </div>
+                <div className="text-slate-400 text-[11px]">
+                  Total Addressable Nodes: {currentEnvelope.payload.b2.total_nodes} | Mandatory Gates: {currentEnvelope.payload.b2.gate_count}
+                </div>
+              </div>
+            )}
+
+            {/* B3 Spatial Bindings */}
+            {currentEnvelope.payload.b3 && (
+              <div className="p-3 bg-slate-950 border border-slate-800 rounded space-y-2 text-xs">
+                <div className="flex items-center justify-between text-indigo-400 font-mono">
+                  <span className="font-semibold">B3 Spatial DNA Bindings</span>
+                  <span>Total Bindings: {currentEnvelope.payload.b3.total_bindings}</span>
+                </div>
+              </div>
+            )}
+
+            {/* B4 Truth Gate */}
+            {currentEnvelope.payload.b4 && (
+              <div className="p-3 bg-slate-950 border border-slate-800 rounded space-y-2 text-xs">
+                <div className="flex items-center justify-between text-amber-400 font-mono">
+                  <span className="font-semibold">B4 Truth Gate Audit</span>
+                  <span>Admitted for B5: {currentEnvelope.payload.b4.admitted_for_b5 ? 'YES' : 'NO'}</span>
+                </div>
+                <div className="text-slate-400 text-[11px]">
+                  PASS: {currentEnvelope.payload.b4.disposition_summary.pass_count} | QUALIFIED: {currentEnvelope.payload.b4.disposition_summary.qualified_count} | UNRESOLVED: {currentEnvelope.payload.b4.disposition_summary.unresolved_count} | VIOLATIONS: {currentEnvelope.payload.b4.disposition_summary.hard_gate_violations}
+                </div>
+              </div>
+            )}
+
+            {/* B5 Semantic Core */}
+            {currentEnvelope.payload.b5 && (
+              <div className="p-3 bg-slate-950 border border-slate-800 rounded space-y-2 text-xs">
+                <div className="flex items-center justify-between text-purple-400 font-mono">
+                  <span className="font-semibold">B5 Semantic Core</span>
+                  <span>Owner Prism: {currentEnvelope.payload.b5.owner_prism}</span>
+                </div>
+                <div className="text-slate-400 text-[11px]">
+                  Posture: {currentEnvelope.payload.b5.presentation_geometry.posture} | Foreground Assertions: {currentEnvelope.payload.b5.semantic_priorities.foreground.length}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SpatialDNAPipelineControlContract",
+  "description": "Comprehensive UI control surface and data interface manifest for the Spatial DNA Pipeline Runtime (Scout through B5)",
+  "version": "1.0.0",
+  "schemaVersion": "0.2.0",
+  "targetEngine": "jules-w-agentwork-runtime",
+  "methods": {
+    "global": [
+      {
+        "name": "init",
+        "description": "Initialize pipeline runtime and configure candidate Spatial DNA",
+        "parameters": [
+          {
+            "name": "config",
+            "type": "PipelineConfig",
+            "optional": true
+          },
+          {
+            "name": "candidateDNA",
+            "type": "CandidateSpatialDNA",
+            "optional": true
+          }
+        ],
+        "returns": "Promise<PipelineInitializationReceipt>"
+      },
+      {
+        "name": "loadTarget",
+        "description": "Loads raw unedited job posting target and initiates Scout intake",
+        "parameters": [
+          {
+            "name": "input",
+            "type": "RawJobInput",
+            "optional": false
+          }
+        ],
+        "returns": "Promise<TravelingEnvelope>"
+      },
+      {
+        "name": "stepStage",
+        "description": "Executes single stage progression across b -> b2 -> b3 -> b4 -> b5 -> stop_before_resume_factory",
+        "parameters": [],
+        "returns": "Promise<TravelingEnvelope>"
+      },
+      {
+        "name": "runStraightThrough",
+        "description": "Executes pipeline end-to-end to B5 completion",
+        "parameters": [],
+        "returns": "Promise<TravelingEnvelope>"
+      },
+      {
+        "name": "pause",
+        "description": "Signals straight-through runner to pause at next stage boundary",
+        "parameters": [],
+        "returns": "void"
+      },
+      {
+        "name": "reset",
+        "description": "Resets runtime state and clears active target envelope",
+        "parameters": [],
+        "returns": "void"
+      },
+      {
+        "name": "exportEnvelope",
+        "description": "Exports current traveling envelope as JSON string",
+        "parameters": [
+          {
+            "name": "prettyPrint",
+            "type": "boolean",
+            "optional": true
+          }
+        ],
+        "returns": "string"
+      },
+      {
+        "name": "getState",
+        "description": "Returns current reactive UI state snapshot",
+        "parameters": [],
+        "returns": "PipelineUIState"
+      }
+    ]
+  },
+  "events": [
+    "stage:transition:start",
+    "stage:transition:complete",
+    "stage:transition:error",
+    "pipeline:status:change",
+    "b1:airlock:verified",
+    "b2:tree:frozen",
+    "b3:binding:complete",
+    "b4:audit:ledger:sealed",
+    "b5:prism:normalized"
+  ],
+  "stageStages": [
+    {
+      "stage": "scout",
+      "produces": "b",
+      "payloadKey": "scout"
+    },
+    {
+      "stage": "b1",
+      "consumes": "b",
+      "produces": "b2",
+      "payloadKey": "b1"
+    },
+    {
+      "stage": "b2",
+      "consumes": "b2",
+      "produces": "b3",
+      "payloadKey": "b2"
+    },
+    {
+      "stage": "b3",
+      "consumes": "b3",
+      "produces": "b4",
+      "payloadKey": "b3"
+    },
+    {
+      "stage": "b4",
+      "consumes": "b4",
+      "produces": "b5",
+      "payloadKey": "b4"
+    },
+    {
+      "stage": "b5",
+      "consumes": "b5",
+      "produces": "stop_before_resume_factory",
+      "payloadKey": "b5"
+    }
+  ],
+  "dispositions": [
+    "PASS",
+    "QUALIFIED_BOUNDED",
+    "UNRESOLVED",
+    "CONTRADICTED"
+  ],
+  "spatialPlanes": [
+    "Experience",
+    "Skills",
+    "Education",
+    "Certifications",
+    "Operations",
+    "Leadership",
+    "Performance"
+  ],
+  "prisms": [
+    "Sales Headhunter",
+    "Sports Agent",
+    "Discovery Scout",
+    "Independent Staffing-Firm Owner",
+    "Casting Director"
+  ],
+  "qualifierBadges": {
+    "*": "hard_candidate_gate",
+    "\u2248": "contextual_condition",
+    "": "required_role_responsibility"
+  }
+}

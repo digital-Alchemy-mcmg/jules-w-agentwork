@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BSidecarAttestationTombstone",
+  "description": "Cryptographic destruction tombstone record verifying stationary B-sidecar lifecycle termination and zero leakage",
+  "version": "2.0.0",
+  "type": "object",
+  "required": [
+    "sidecar_id",
+    "status",
+    "lifecycle_metrics",
+    "cryptographic_proofs",
+    "b5_trace_verification",
+    "destruction_verification"
+  ],
+  "properties": {
+    "sidecar_id": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["TERMINATED_AND_VERIFIED", "DESTROYED_UNVERIFIED_ABORT"]
+    },
+    "lifecycle_metrics": {
+      "type": "object",
+      "required": ["created_at", "tags_purged_at", "destroyed_at"],
+      "properties": {
+        "created_at": { "type": "string" },
+        "tags_purged_at": { "type": "string" },
+        "destroyed_at": { "type": "string" }
+      }
+    },
+    "cryptographic_proofs": {
+      "type": "object",
+      "required": [
+        "original_content_sha256",
+        "tag_layer_sha256",
+        "b2_frozen_tree_sha256",
+        "b4_lineage_ledger_sha256"
+      ],
+      "properties": {
+        "original_content_sha256": { "type": "string" },
+        "tag_layer_sha256": { "type": "string" },
+        "b2_frozen_tree_sha256": { "type": "string" },
+        "b4_lineage_ledger_sha256": { "type": "string" }
+      }
+    },
+    "b5_trace_verification": {
+      "type": "object",
+      "required": ["verifier_id", "result", "verified_walk", "hash_matched"],
+      "properties": {
+        "verifier_id": { "type": "string" },
+        "result": { "type": "string", "enum": ["PASSED", "FAILED"] },
+        "verified_walk": { "type": "string" },
+        "hash_matched": { "type": "boolean" }
+      }
+    },
+    "destruction_verification": {
+      "type": "object",
+      "required": ["method", "verified_zeroed", "attested_by"],
+      "properties": {
+        "method": { "type": "string" },
+        "verified_zeroed": { "type": "boolean" },
+        "attested_by": { "type": "string" }
+      }
+    }
+  }
+}

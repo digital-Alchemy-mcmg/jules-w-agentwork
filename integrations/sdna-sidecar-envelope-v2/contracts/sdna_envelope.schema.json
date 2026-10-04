@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SpatialCandidateDNAEnvelope",
+  "description": "Validation schema for Candidate Spatial DNA portable YAML/JSON envelopes",
+  "version": "2.0.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "candidate",
+    "source_registry",
+    "domains",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["0.2.0", "1.0.0", "2.0.0"]
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["candidate_id", "full_name"],
+      "properties": {
+        "candidate_id": { "type": "string" },
+        "full_name": { "type": "string" },
+        "primary_contact": { "type": "object" }
+      }
+    },
+    "source_registry": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "source_type", "hash"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "source_type": { "type": "string" },
+          "hash": { "type": "string" }
+        }
+      }
+    },
+    "domains": {
+      "type": "object",
+      "description": "Exactly the six closed parent domains",
+      "required": [
+        "IDENTITY",
+        "WORK_HISTORY",
+        "EDUCATION_TECH",
+        "CREATIVE_PROJECTS",
+        "COGNITIVE_PROFILE",
+        "TESTIMONY_REFERENCES"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "IDENTITY": { "$ref": "#/definitions/DomainPayload" },
+        "WORK_HISTORY": { "$ref": "#/definitions/DomainPayload" },
+        "EDUCATION_TECH": { "$ref": "#/definitions/DomainPayload" },
+        "CREATIVE_PROJECTS": { "$ref": "#/definitions/DomainPayload" },
+        "COGNITIVE_PROFILE": { "$ref": "#/definitions/DomainPayload" },
+        "TESTIMONY_REFERENCES": { "$ref": "#/definitions/DomainPayload" }
+      }
+    },
+    "chronology": {
+      "type": "object",
+      "properties": {
+        "events": { "type": "array" },
+        "state_transitions": { "type": "array" }
+      }
+    },
+    "conflicts": {
+      "type": "object",
+      "properties": {
+        "unresolved": { "type": "array" },
+        "resolved": { "type": "array" }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from_atom_id", "to_atom_id", "relation_type"]
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["content_sha256", "signed_epoch"],
+      "properties": {
+        "content_sha256": { "type": "string" },
+        "signed_epoch": { "type": "number" }
+      }
+    }
+  },
+  "definitions": {
+    "DomainPayload": {
+      "type": "object",
+      "required": ["domain_id", "atoms"],
+      "properties": {
+        "domain_id": { "type": "string" },
+        "atoms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["atom_id", "source_pointer", "evidence_provenance"],
+            "properties": {
+              "atom_id": { "type": "string" },
+              "source_pointer": { "type": "string" },
+              "branch_provenance": { "type": "string" },
+              "evidence_provenance": { "type": "string" },
+              "content": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

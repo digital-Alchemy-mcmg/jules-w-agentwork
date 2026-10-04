@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { CheckCircle2, ShieldCheck, Play, RefreshCw, Terminal, Copy, Check } from 'lucide-react';
 import { COMPLIANCE_POINTS } from '../data/scoutData';
-import { 
-  normalizePostingUrl, 
-  normalizeEmployerName, 
-  sha256Hex, 
-  computeDeduplicationKey, 
+import {
+  normalizePostingUrl,
+  normalizeEmployerName,
+  sha256Hex,
+  computeDeduplicationKey,
   computeObservationId,
   decomposeJobProse,
   isMarketingFluff,
@@ -85,8 +85,8 @@ export const CartridgeView: React.FC = () => {
         rawSourceText: "Operations Supervisor at Apex Tech. Supervise floor operations."
       };
       const { candidate, envelope } = await processLiveJobToEnvelope(testJob);
-      const envPassed = candidate.status === 'ACCEPTED' && 
-                        envelope?.stage_state.current_stage === 'b' && 
+      const envPassed = candidate.status === 'ACCEPTED' &&
+                        envelope?.stage_state.current_stage === 'b' &&
                         envelope?.payload.scout.original_target_source.is_preserved_source === true &&
                         envelope?.payload.scout.original_target_source.source_hash.startsWith('sha256:');
       logs.push(`[TEST 7] test_section_8_source_preservation: ${envPassed ? 'PASSED' : 'FAILED'} (Source hash: ${envelope?.payload.scout.original_target_source.source_hash.slice(0, 20)}...)`);

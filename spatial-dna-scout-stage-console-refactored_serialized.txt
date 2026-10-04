@@ -226,7 +226,7 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   // Dynamic live receipt generated from actual candidates & envelopes
-  const [receipt, setReceipt] = useState<CompletionReceipt>(() => 
+  const [receipt, setReceipt] = useState<CompletionReceipt>(() =>
     generateLiveCompletionReceipt([], [])
   );
 
@@ -296,7 +296,7 @@ export default function App() {
         )}
 
         {activeTab === 'corpus' && (
-          <CorpusView 
+          <CorpusView
             candidates={candidates}
             onInspectEnvelope={handleInspectEnvelope}
             onNavigateToIngest={() => setActiveTab('ingest')}
@@ -304,7 +304,7 @@ export default function App() {
         )}
 
         {activeTab === 'envelopes' && (
-          <EnvelopesView 
+          <EnvelopesView
             envelopes={envelopes}
             initialEnvelopeId={selectedEnvelopeId}
             onNavigateToIngest={() => setActiveTab('ingest')}
@@ -312,7 +312,7 @@ export default function App() {
         )}
 
         {activeTab === 'telemetry' && (
-          <GateTelemetryView 
+          <GateTelemetryView
             candidates={candidates}
             onNavigateToIngest={() => setActiveTab('ingest')}
           />
@@ -366,11 +366,11 @@ FILE: src/components/CartridgeView.tsx
 import React, { useState } from 'react';
 import { CheckCircle2, ShieldCheck, Play, RefreshCw, Terminal, Copy, Check } from 'lucide-react';
 import { COMPLIANCE_POINTS } from '../data/scoutData';
-import { 
-  normalizePostingUrl, 
-  normalizeEmployerName, 
-  sha256Hex, 
-  computeDeduplicationKey, 
+import {
+  normalizePostingUrl,
+  normalizeEmployerName,
+  sha256Hex,
+  computeDeduplicationKey,
   computeObservationId,
   decomposeJobProse,
   isMarketingFluff,
@@ -450,8 +450,8 @@ export const CartridgeView: React.FC = () => {
         rawSourceText: "Operations Supervisor at Apex Tech. Supervise floor operations."
       };
       const { candidate, envelope } = await processLiveJobToEnvelope(testJob);
-      const envPassed = candidate.status === 'ACCEPTED' && 
-                        envelope?.stage_state.current_stage === 'b' && 
+      const envPassed = candidate.status === 'ACCEPTED' &&
+                        envelope?.stage_state.current_stage === 'b' &&
                         envelope?.payload.scout.original_target_source.is_preserved_source === true &&
                         envelope?.payload.scout.original_target_source.source_hash.startsWith('sha256:');
       logs.push(`[TEST 7] test_section_8_source_preservation: ${envPassed ? 'PASSED' : 'FAILED'} (Source hash: ${envelope?.payload.scout.original_target_source.source_hash.slice(0, 20)}...)`);
@@ -819,7 +819,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
               <span className="text-slate-500 font-mono text-xs">Audit & Inspection</span>
             </div>
             <div className="space-y-2 text-xs">
-              <button 
+              <button
                 onClick={() => onSelectTab('ingest')}
                 className="w-full text-left p-2.5 bg-cyan-950/30 hover:bg-cyan-950/50 border border-cyan-800/50 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -829,7 +829,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('corpus')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -839,7 +839,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('envelopes')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -849,7 +849,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('telemetry')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -859,7 +859,7 @@ export const ConsoleView: React.FC<ConsoleViewProps> = ({
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
               </button>
-              <button 
+              <button
                 onClick={() => onSelectTab('receipt')}
                 className="w-full text-left p-2.5 bg-slate-900/70 hover:bg-slate-900 border border-slate-800 rounded flex items-center justify-between group transition-colors cursor-pointer"
               >
@@ -1195,7 +1195,7 @@ export const CorpusView: React.FC<CorpusViewProps> = ({
 FILE: src/components/EnvelopesView.tsx
 ------
 import React, { useState } from 'react';
-import { 
+import {
   FileText, Copy, Check, Download, Layers, Database, Lock, CheckCircle2, PlusCircle
 } from 'lucide-react';
 import { FOURTEEN_SEMANTIC_CATEGORIES } from '../data/scoutData';
@@ -1220,7 +1220,7 @@ export const EnvelopesView: React.FC<EnvelopesViewProps> = ({
   const [copiedJson, setCopiedJson] = useState<boolean>(false);
   const [copiedSource, setCopiedSource] = useState<boolean>(false);
 
-  const currentEnvelope: TravelingEnvelope | undefined = 
+  const currentEnvelope: TravelingEnvelope | undefined =
     envelopes.find(e => e.envelope_id === selectedEnvId) || envelopes[0];
 
   const handleCopyJson = () => {
@@ -1942,7 +1942,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Zone 1: Single text element wordmark */}
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setActiveTab('console')}
             className="text-left group cursor-pointer"
           >

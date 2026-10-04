@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "test:b1": "node --test --experimental-test-isolation=none tests/b1Engine.test.mjs",
-    "b1": "node scripts/b1-run.mjs"
+    "test:pipeline": "node --test --experimental-test-isolation=none tests/b1Engine.test.mjs tests/pipelineStraightThrough.test.mjs",
+    "b1": "node scripts/b1-run.mjs",
+    "pipeline": "node scripts/pipeline-run.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

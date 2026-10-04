@@ -1,3 +1,8 @@
 node_modules/
 dist/
 .b1-execution/
+.pipeline-execution/
+.test-run/
+__pycache__/
+*.pyc
+extracted_zips/

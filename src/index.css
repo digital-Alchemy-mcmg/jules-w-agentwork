@@ -1,8 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Instrument+Sans:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-@theme {
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+}
+
+:root {
+  --background: #F8F7F5;
+  --foreground: #1A1916;
+  --card: #FFFFFF;
+  --card-foreground: #1A1916;
+  --primary: #2D4A6B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F0EEE9;
+  --secondary-foreground: #3C3A36;
+  --muted: #EAE8E3;
+  --muted-foreground: #6E6B65;
+  --accent: #3D5A80;
+  --accent-foreground: #FFFFFF;
+  --border: #E2DFD8;
+  --ring: #3D5A80;
+  --radius: 5px;
+}
+
+.dark {
+  --background: #111110;
+  --foreground: #EDEAE4;
+  --card: #1A1917;
+  --card-foreground: #EDEAE4;
+  --primary: #5B82A8;
+  --primary-foreground: #FFFFFF;
+  --secondary: #232220;
+  --secondary-foreground: #C8C4BC;
+  --muted: #1E1D1B;
+  --muted-foreground: #8A8680;
+  --accent: #5B82A8;
+  --accent-foreground: #FFFFFF;
+  --border: #2A2926;
+  --ring: #5B82A8;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }
 
 ::-webkit-scrollbar {

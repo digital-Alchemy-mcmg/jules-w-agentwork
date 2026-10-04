@@ -163,6 +163,22 @@ export interface TravelingEnvelope {
     current_stage: 'b2';
     completed_stages: ['scout', 'b1'];
     status: 'ready';
+  } | {
+    current_stage: 'b3';
+    completed_stages: ['scout', 'b1', 'b2'];
+    status: 'ready';
+  } | {
+    current_stage: 'b4';
+    completed_stages: ['scout', 'b1', 'b2', 'b3'];
+    status: 'ready';
+  } | {
+    current_stage: 'b5';
+    completed_stages: ['scout', 'b1', 'b2', 'b3', 'b4'];
+    status: 'ready';
+  } | {
+    current_stage: 'stop_before_resume_factory';
+    completed_stages: ['scout', 'b1', 'b2', 'b3', 'b4', 'b5'];
+    status: 'complete';
   };
   append_log: Array<{
     stage: string;
@@ -176,19 +192,209 @@ export interface TravelingEnvelope {
   }>;
   payload: {
     scout: ScoutPayload;
-    b: null;
+    b: null | { handoff_accepted: boolean; timestamp: string; boundary_hash: string };
     b1: B1Payload | null;
-    b2: null;
-    b3: null;
-    b4: null;
-    b5: null;
+    b2: B2Payload | null;
+    b3: B3Payload | null;
+    b4: B4Payload | null;
+    b5: B5Payload | null;
   };
 }
 
 export type B1OutputEnvelope = TravelingEnvelope & {
   stage_state: { current_stage: 'b2'; completed_stages: ['scout', 'b1']; status: 'ready' };
-  payload: TravelingEnvelope['payload'] & { b1: B1Payload };
+  payload: TravelingEnvelope['payload'] & { b1: B1Payload; b2: null; b3: null; b4: null; b5: null };
 };
+
+export type B2OutputEnvelope = TravelingEnvelope & {
+  stage_state: { current_stage: 'b3'; completed_stages: ['scout', 'b1', 'b2']; status: 'ready' };
+  payload: TravelingEnvelope['payload'] & { b1: B1Payload; b2: B2Payload; b3: null; b4: null; b5: null };
+};
+
+export type B3OutputEnvelope = TravelingEnvelope & {
+  stage_state: { current_stage: 'b4'; completed_stages: ['scout', 'b1', 'b2', 'b3']; status: 'ready' };
+  payload: TravelingEnvelope['payload'] & { b1: B1Payload; b2: B2Payload; b3: B3Payload; b4: null; b5: null };
+};
+
+export type B4OutputEnvelope = TravelingEnvelope & {
+  stage_state: { current_stage: 'b5'; completed_stages: ['scout', 'b1', 'b2', 'b3', 'b4']; status: 'ready' };
+  payload: TravelingEnvelope['payload'] & { b1: B1Payload; b2: B2Payload; b3: B3Payload; b4: B4Payload; b5: null };
+};
+
+export type B5OutputEnvelope = TravelingEnvelope & {
+  stage_state: { current_stage: 'stop_before_resume_factory'; completed_stages: ['scout', 'b1', 'b2', 'b3', 'b4', 'b5']; status: 'complete' };
+  payload: TravelingEnvelope['payload'] & { b1: B1Payload; b2: B2Payload; b3: B3Payload; b4: B4Payload; b5: B5Payload };
+};
+
+// ==========================================
+// B2 Target Tree Types
+// ==========================================
+export type B2SemanticForce = 'hard_candidate_gate' | 'contextual_condition' | 'required_role_responsibility' | 'target_identity' | 'application_routing';
+
+export interface B2Node {
+  address: string; // Deterministic lowercase alphanumeric e.g. "t.id.org", "t.gate.g01", "t.duty.d01"
+  parent_address: string | null;
+  category: 'identity' | 'routing' | 'gate' | 'condition' | 'duty';
+  title: string;
+  node_text: string;
+  marker: B1Marker;
+  semantic_force: B2SemanticForce;
+  source_span_id: string;
+  source_span_provenance: {
+    raw_text: string;
+    start_offset: number;
+    end_offset: number;
+  };
+  qualifier_scope?: string;
+  child_addresses: string[];
+}
+
+export interface B2Payload {
+  tree_id: string;
+  root_address: string;
+  target_source_hash: string;
+  frozen: true;
+  total_nodes: number;
+  gate_count: number;
+  nodes: Record<string, B2Node>;
+  diagnostic_trace: Array<{ address: string; code: string; detail: string }>;
+}
+
+// ==========================================
+// Spatial DNA & B3 Binding Types
+// ==========================================
+export type SpatialDNAPlane =
+  | 'Experience'
+  | 'Skills'
+  | 'Education'
+  | 'Certifications'
+  | 'Operations'
+  | 'Leadership'
+  | 'Performance';
+
+export interface CandidateEvidenceAtom {
+  atom_id: string;
+  plane: SpatialDNAPlane;
+  category: string;
+  statement: string;
+  context?: string;
+  chronology?: string;
+  source_document: string;
+}
+
+export interface CandidateSpatialDNA {
+  candidate_id: string;
+  planes: Record<SpatialDNAPlane, CandidateEvidenceAtom[]>;
+}
+
+export interface B3BindingRecord {
+  target_address: string;
+  target_node_text: string;
+  semantic_force: B2SemanticForce;
+  satisfaction_question: string;
+  eligible_planes: SpatialDNAPlane[];
+  atoms_considered: CandidateEvidenceAtom[];
+  atoms_selected: CandidateEvidenceAtom[];
+  atomic_blurbs: string[];
+  proposition: string;
+  rationale: string;
+}
+
+export interface B3Payload {
+  binding_session_uid: string;
+  total_bindings: number;
+  bindings: B3BindingRecord[];
+  diagnostic_trace: Array<{ target_address: string; code: string; detail: string }>;
+}
+
+// ==========================================
+// B4 Truth Gate Types
+// ==========================================
+export type B4Disposition =
+  | 'PASS'
+  | 'QUALIFIED_BOUNDED'
+  | 'UNRESOLVED'
+  | 'CONTRADICTED';
+
+export interface B4AuditRecord {
+  target_address: string;
+  target_node_text: string;
+  semantic_force: B2SemanticForce;
+  disposition: B4Disposition;
+  admitted_proposition: string | null;
+  bounded_scope: string | null;
+  evidence_ceiling: string;
+  hard_gate_violation: boolean;
+  reason: string;
+  audit_trace: string[];
+  selected_evidence_references: string[]; // atom_ids only
+}
+
+export interface B4Payload {
+  audit_session_uid: string;
+  boundary_b4_hash: string;
+  disposition_summary: {
+    pass_count: number;
+    qualified_count: number;
+    unresolved_count: number;
+    contradicted_count: number;
+    hard_gate_violations: number;
+  };
+  audited_ledger: Record<string, B4AuditRecord>;
+  admitted_for_b5: boolean;
+  diagnostic_trace: Array<{ target_address: string; code: string; detail: string }>;
+}
+
+// ==========================================
+// B5 Semantic Core Reasoning Types
+// ==========================================
+export type B5PrismType =
+  | 'Sales Headhunter'
+  | 'Sports Agent'
+  | 'Discovery Scout'
+  | 'Independent Staffing-Firm Owner'
+  | 'Casting Director';
+
+export type B5PresentationGeometry =
+  | 'single_dominant'
+  | 'dual_dominant'
+  | 'dominant_plus_secondary'
+  | 'distributed';
+
+export interface B5PrismAssessment {
+  prism: B5PrismType;
+  description: string;
+  projection_priority: number; // 1 (highest) to 5
+  emphasis_percentage: number; // Sum = 100
+  supported_projection: string;
+  evidence_anchors: string[]; // B4 target addresses and atom_ids
+}
+
+export interface B5Payload {
+  session_uid: string;
+  boundary_b5_hash: string;
+  owner_prism: B5PrismType;
+  ranked_five_prisms: B5PrismAssessment[];
+  projection_emphasis_percentages: Record<B5PrismType, number>;
+  evidence_anchors: Record<string, string[]>; // Target address -> supporting evidence
+  semantic_priorities: {
+    foreground: string[];
+    reinforcement: string[];
+    background: string[];
+    suppression: string[];
+  };
+  writing_boundaries: {
+    assertiveness_ceiling: string;
+    permitted_tone: string;
+    allowed_assertions: string[];
+  };
+  prohibited_implications: string[];
+  presentation_geometry: {
+    posture: B5PresentationGeometry;
+    rationale: string;
+  };
+  diagnostic_trace: Array<{ code: string; detail: string }>;
+}
 
 export interface CompletionReceipt {
   runner_id: string;
