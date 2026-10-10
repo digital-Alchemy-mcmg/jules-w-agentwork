@@ -1,3 +1,12 @@
+
+export interface RelationshipEdge {
+  edge_id: string;
+  source_address: string;
+  target_address: string;
+  relation_type: string;
+  description?: string;
+  provenance_spans: string[];
+}
 export interface RawJobInput {
   id: string; // e.g. JOB-LIVE-001
   title: string;
@@ -91,6 +100,74 @@ export interface ScoutPayload {
   cartridge_id: string;
 }
 
+export type B1Marker = '*' | '≈' | '';
+export interface B1SourceSpan {
+  source_span_id: string;
+  raw_text: string;
+  start_offset: number;
+  end_offset: number;
+}
+export interface B1Primitive {
+  marker: B1Marker;
+  node_text: string;
+  source_span_id: string;
+  qualifier_scope?: string;
+}
+export type B1MalformDiagnostic = 'VALID_JOB_OBJECT'
+  | 'MALFORMED — ORIGIN MISSING' | 'MALFORMED — DESTINATION MISSING'
+  | 'MALFORMED — UNROUTABLE JOB OBJECT';
+export interface B1Payload {
+  b1_header: {
+    session_uid: string;
+    stage_status: 'completed' | 'halted';
+    malform_diagnostic: B1MalformDiagnostic;
+    candidate_blind_airlock: 'VERIFIED_LOCKED';
+    boundary_b_in_hash: string;
+    boundary_b_out_hash: string;
+    mode: 'HALT_ON_MALFORM';
+  };
+  target_identification_envelope: Record<
+    'company_organization' | 'posting_party' | 'job_title' | 'requisition_id'
+    | 'employment_type' | 'location' | 'work_arrangement' | 'relocation_terms'
+    | 'compensation' | 'schedule_posting_date', B1Primitive[]>;
+  application_routing: Record<'application_method' | 'destination_url'
+    | 'recruiter_contact' | 'required_submission_materials' | 'special_instructions', B1Primitive[]>;
+  operational_primitives: Record<'target_role' | 'hard_candidate_gates'
+    | 'contextual_conditions' | 'required_role_responsibilities', B1Primitive[]>;
+  source_spans: B1SourceSpan[];
+  de_theatricalization_log: Array<{ source_span_id: string; action: 'retained'; reason: string }>;
+  diagnostic_trace: Array<{ source_span_id?: string; code: string; detail: string }>;
+  processed_source_text?: string;
+}
+
+
+export interface B2Payload {
+  b2_header: {
+    session_uid: string;
+    stage_status: string;
+    candidate_blind_airlock: 'VERIFIED_LOCKED';
+    target_tree_hash: string;
+    node_count: number;
+    freeze_state: 'FROZEN_B2';
+  };
+  target_tree: import('./b2').TargetTreeNode;
+  address_index: Record<string, string>;
+  provenance_map: {
+    span_to_addresses: Record<string, string[]>;
+    address_to_spans: Record<string, string[]>;
+    primitive_to_addresses: Record<string, string[]>;
+  };
+  completeness_manifest: {
+    session_uid: string;
+    total_primitives_evaluated: number;
+    status: 'COMPLETE_PASS' | 'INCOMPLETE_HALT';
+    unresolved_count: number;
+    dispositions: Record<string, import('./b2').PrimitiveDisposition>;
+    summary: any;
+  };
+  relationship_graph: RelationshipEdge[];
+}
+
 export interface TravelingEnvelope {
   schema_version: '0.2.0';
   envelope_id: string;
@@ -116,8 +193,8 @@ export interface TravelingEnvelope {
     };
   };
   stage_state: {
-    current_stage: 'b';
-    completed_stages: ['scout'];
+    current_stage: 'b' | 'b1' | 'b2' | 'b3';
+    completed_stages: string[];
     status: 'ready';
   };
   append_log: Array<{
@@ -133,8 +210,8 @@ export interface TravelingEnvelope {
   payload: {
     scout: ScoutPayload;
     b: null;
-    b1: null;
-    b2: null;
+    b1: B1Payload | null;
+    b2: B2Payload | null;
     b3: null;
     b4: null;
     b5: null;
